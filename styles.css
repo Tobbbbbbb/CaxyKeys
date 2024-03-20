@@ -1,0 +1,189 @@
+/* most css is taken directly from lfa's website*/
+
+html, body {
+    font-family: "Neue Helvetica W05", ;
+}
+
+p {
+    margin:0px;
+    margin-left: 10px;
+    padding:0px;
+    color:#3a3737;
+    font-size:16px;
+}
+
+h1 {
+    color:#121111;
+    margin:auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h2 {
+    margin:0px;
+    margin-left: 10px;
+    padding:0px;
+    font-size: 24px;
+    color:#121111;
+}
+
+label {
+    color:#3a3737;
+    font-size:16px;
+    margin-left: 10px;
+}
+
+button, input[type="file"]::file-selector-button {
+    display: inline-block;
+    border: 2px solid #f37121;
+    margin:auto;
+    padding: 10px 20px;
+    background: transparent;
+    color: #f37121;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+    border-radius: 0;
+    text-align: center;
+    text-transform: uppercase;
+    -webkit-transition: .3s;
+    transition: .3s;
+    font-family: "Neue Helvetica W01",;
+    font-weight: 700;
+    position: relative;
+    cursor: pointer;
+}
+
+button {
+    display: flex;
+}
+
+input[type="file"]::file-selector-button {
+    margin-right:10px
+}
+
+button:hover, input[type="file"]::file-selector-button:hover{
+    background-color: #f37121;
+    color:white;
+}
+
+#output {
+    margin-left: 10px;
+    color:#3a3737;
+    font-size:16px;
+}
+
+body {
+    margin: 0px;
+}
+
+.top-bar {
+    position: relative;
+    margin: 0 auto;
+    padding: 0 20px;
+    max-width: 1180px;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    background-color:#f37121;
+}
+
+img {
+    height: auto;
+    max-width: 100%;
+}
+
+input[type=file] {
+    display:none
+}
+
+#name, input[type=file]{
+    box-shadow: 0 0 0 1px #747476;
+    display: block;
+    border: 1px solid #DCDDE0;
+    padding: 7px 12px;
+    border-radius: 3px;
+    transition: box-shadow ease .1s, -webkit-box-shadow ease .1s;
+    cursor: text;
+    overflow: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+#name:hover, input[type=file]:hover {
+    border-color: #1f78d8;
+    box-shadow: 0 0 1px #1f78d8;
+    outline: none; 
+}
+
+/* checkmark taken mostly from w3schools */
+
+.container {
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    border-radius: 2px;
+    background-color: #fff;
+    border: 2px solid #c1c1c1;
+    font-size: 1px;
+    height: 24px;
+    position: absolute;
+    -webkit-transition: .3s;
+    width: 24px;
+    z-index: 1;
+  }
+  
+  .container:hover input ~ .checkmark {
+    background-color: #c1c1c1;
+    -webkit-transition: .3s;
+  }
+  
+  .container input:checked ~ .checkmark {
+    background-color: #f37121;
+  }
+  
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  .container .checkmark:after {
+    left: 8px;
+    top: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  #check{
+    display:inline-block
+  }
+
+input {
+    margin-left:10px;
+}

@@ -8,18 +8,26 @@ from nodes import Student
 
 NUMDAYS = 7
 
-def main():
+def main(form, schedule, shadows, name, order):
     # change to 4 when we input students
-    if len(sys.argv) != 5:
+    '''if len(sys.argv) != 5:
         sys.exit(
 
-            "Usage: python CaxyKeys.py form.csv schedule.csv index"
+            "Usage: python CaxyKeys.py form.csv schedule.csv shadows index order"
         )
     students = loadPeople(sys.argv[1], sys.argv[2])
     prospective, time = loadProspective(sys.argv[3], int(sys.argv[4]))
     students = limitStudents(students, prospective, time)
     #print(len(students))
-    students = orderStudents(students, prospective, time)
+    students = orderStudents(students, prospective, time, bool(sys.argv[5]))'''
+
+    students = loadPeople(form, schedule)
+    prospective, time = loadProspective(shadows, name)
+    #print(len(students))
+    students = limitStudents(students, prospective, time)
+    #print(len(students))
+    students = orderStudents(students, prospective, time, bool(order))
+
     return output(students, prospective, time)
         #print(students[i].getArts())
 
@@ -32,77 +40,86 @@ def sortByEmail(person):
 def loadPeople(form, schedule):
     studentList = list()
     emailList = list()
-    with open(form) as sheet:
+    '''with open(form) as sheet:
         reader = csv.reader(sheet)
-        next(reader)
-        for num, row in enumerate(reader):
-            email = row[1].lower()
-            emailList.append(email)
-            firstName = row[2]
-            lastName = row[3]
-            grade = int(row[4][:-8])
-            gender = row[5]
-            middleSchool = row[7]
-            dayBoard = row[8]
-            town = row[9]
-            languages = row[10].split(', ')
-            sportsLFA = row[11].split(', ')
-            sportsNotLFA = row[12].split(', ')
-            arts = row[13].split(', ')
-            affinity = row[14].split(', ')
-            clubsMajor = row[15].split(', ')
-            clubsMinor = row[16].split(', ')
-            interests = row[17].split(', ')
-            if len(row) > 19:
-                numVisits = int(row[19])
-            else:
-                numVisits = 0
+        next(reader)'''
+    #print(form)
+    for num, rowx in enumerate(form.splitlines()[1:]):
+        rowy = rowx.replace(', ', '^ ')
+        rowy = rowy.replace('"', '')
+        row = rowy.split(',')
+        #print(row)
+        email = row[1].lower()
+        emailList.append(email)
+        firstName = row[2]
+        lastName = row[3]
+        grade = int(row[4][:-8])
+        gender = row[5]
+        middleSchool = row[7]
+        dayBoard = row[8]
+        town = row[9]
+        languages = row[10].split('^ ')
+        sportsLFA = row[11].split('^ ')
+        sportsNotLFA = row[12].split('^ ')
+        arts = row[13].split('^ ')
+        affinity = row[14].split('^ ')
+        clubsMajor = row[15].split('^ ')
+        clubsMinor = row[16].split('^ ')
+        interests = row[17].split('^ ')
+        if len(row) > 19:
+            numVisits = int(row[19])
+        else:
+            numVisits = 0
 
-            person =  Student(email, firstName, lastName,
-            grade, gender, middleSchool, dayBoard, town, languages,
-            sportsLFA, sportsNotLFA, arts, affinity, clubsMajor,
-            clubsMinor, interests, numVisits)
-            studentList.append(person)
+        person =  Student(email, firstName, lastName,
+        grade, gender, middleSchool, dayBoard, town, languages,
+        sportsLFA, sportsNotLFA, arts, affinity, clubsMajor,
+        clubsMinor, interests, numVisits)
+        studentList.append(person)
     studentList = sorted(studentList, key = sortByEmail)
     emailList = [person.getEmail() for person in studentList]
 
-    with open(schedule) as sheet:
+    '''with open(schedule) as sheet:
         reader = csv.reader(sheet)
-        next(reader)
-        for num, row in enumerate(reader):
-            if row[2] in emailList:
-                subject = row[3]
-                if subject[0:2] == "10" or subject[0:2] == "99":
-                    continue
-                name = row[4][9:]
-                period = row[8][1]
-                if(not period.isdigit()):
-                    continue
-                code = ""
-                for i in range (NUMDAYS):
-                    if (len(row[10 + 3*i]) == 0):
-                        code += "0"
+        next(reader)'''
+    for num, rowx in enumerate(schedule.splitlines()[1:]):
+        rowy = rowx.replace(', ', '^ ')
+        rowy = rowy.replace('"', '')
+        row = rowy.split(',')
+        #print(row)
+        if row[2] in emailList:
+            subject = row[3]
+            if subject[0:2] == "10" or subject[0:2] == "99":
+                continue
+            name = row[4][9:]
+            period = row[8][1]
+            if(not period.isdigit()):
+                continue
+            code = ""
+            for i in range (NUMDAYS):
+                if (len(row[10 + 3*i]) <= 2):
+                    code += "0"
+                else:
+                    eleven = re.split(':| ', row[11+3*i])
+                    ten = re.split(':| ',row[10+3*i])
+                    if (int(eleven[0]) < 8):
+                        eleven[0] = int(eleven[0]) + 12
+                    if (int(ten[0]) < 8):
+                        ten[0] = int(ten[0]) + 12
+                    if (
+                        60*int(eleven[0]) + int(eleven[1]) -
+                        60*int(ten[0]) - int(ten[1]) > 45
+                    ):
+                        code += "2"
                     else:
-                        eleven = re.split(':| ', row[11+3*i])
-                        ten = re.split(':| ',row[10+3*i])
-                        if (int(eleven[0]) < 8):
-                            eleven[0] = int(eleven[0]) + 12
-                        if (int(ten[0]) < 8):
-                            ten[0] = int(ten[0]) + 12
-                        if (
-                            60*int(eleven[0]) + int(eleven[1]) -
-                            60*int(ten[0]) - int(ten[1]) > 45
-                        ):
-                            code += "2"
-                        else:
-                            code += "1"
-                studentList[emailList.index(row[2])].setClass(
-                    name, subject, code, period
-                )
+                        code += "1"
+            studentList[emailList.index(row[2])].setClass(
+                name, subject, code, period
+            )
     return studentList
 
-def loadProspective(form, index):
-    lines = len(open(form, 'r').readlines())
+def loadProspective(form, name):
+    '''lines = len(open(form, 'r').readlines())
     with open(form) as sheet:
         reader = csv.reader(sheet)
         if index >= 1:
@@ -110,33 +127,45 @@ def loadProspective(form, index):
                 next(reader)
         else:
             for i in range(lines+index):
-                next(reader)
-        for row in reader:
-            firstName = row[2]
-            lastName = row[3]
-            grade = int(row[4][:-8])
-            gender = row[5]
-            middleSchool = row[6]
-            dayBoard = row[7]
-            town = row[8]
-            languages = row[9].split(', ')
-            sportsLFA = row[10].split(', ')
-            arts = row[11].split(', ')
-            affinity = row[12].split(', ')
-            clubs = row[13].split(', ')
-            interests = row[14].split(', ')
-            date = row[15]
-            letter = row[16]
-            firstPeriod = row[17]
-            lastPeriod = row[18]
+                next(reader)'''
+    #print(form)
+    index = -1
+    for num, rowx in enumerate(form.splitlines()[1:]):
+        row = rowx.split(',')
+        fullName = row[2] + " " + row[3]
+        if name.lower() == fullName.lower():
+            index = num + 1
             break
+    rowx = form.splitlines()[index]
+    #print(rowx)
+    rowy = rowx.replace(', ', '^ ')
+    rowy = rowy.replace('"', '')
+    row = rowy.split(',')
+    #print(row)
+    firstName = row[2]
+    lastName = row[3]
+    grade = int(row[4][:-8])
+    gender = row[5]
+    middleSchool = row[6]
+    dayBoard = row[7]
+    town = row[8]
+    languages = row[9].split('^ ')
+    sportsLFA = row[10].split('^ ')
+    arts = row[11].split('^ ')
+    affinity = row[12].split('^ ')
+    clubs = row[13].split('^ ')
+    interests = row[14].split('^ ')
+    date = row[15]
+    letter = row[16]
+    firstPeriod = row[17]
+    lastPeriod = row[18]
 
-        person =  Student(None, firstName, lastName,
-            grade, gender, middleSchool, dayBoard, town, languages,
-            sportsLFA, None, arts, affinity, clubs,
-            None, interests, None)
-        day = [date, letter, firstPeriod, lastPeriod]
-        return person, day
+    person =  Student(None, firstName, lastName,
+        grade, gender, middleSchool, dayBoard, town, languages,
+        sportsLFA, None, arts, affinity, clubs,
+        None, interests, None)
+    day = [date, letter, firstPeriod, lastPeriod]
+    return person, day
 
 def limitStudents(students, prospective, date):
     savedList = copy.deepcopy(students)
@@ -153,7 +182,7 @@ def limitStudents(students, prospective, date):
                 updatedList.append(student)
     savedList = copy.deepcopy(updatedList)
     updatedList = list()
-
+    
     #check grade matches ± 1
     for student in savedList:
         if student.getGrade() == prospective.getGrade() or\
@@ -161,7 +190,7 @@ def limitStudents(students, prospective, date):
             updatedList.append(student)
     savedList = copy.deepcopy(updatedList)
     updatedList = list()
-
+    
     #check boarding matches
     if prospective.getDayBoard() == 'Boarding':
         for student in savedList:
@@ -179,6 +208,7 @@ def limitStudents(students, prospective, date):
         numFrees = 0
         schedule = student.getDaySchedule(date[1], int(date[2]), int(date[3]))
         for course in schedule:
+            #print(course)
             if course == []:
                 numFrees += 1
                 continue
@@ -192,6 +222,7 @@ def limitStudents(students, prospective, date):
             updatedList.append(student)
     savedList = copy.deepcopy(updatedList)
     updatedList = list()
+    #print(len(savedList))
 
     for student in savedList:
         if student.getNumVisits() < 2:
@@ -203,7 +234,7 @@ def limitStudents(students, prospective, date):
 
 
 #order up!
-def orderStudents(students, prospective, date):
+def orderStudents(students, prospective, date, order):
 
     checkFor = list()
     if "Mathematics" in prospective.getInterests():
@@ -280,10 +311,10 @@ def orderStudents(students, prospective, date):
         #print(count)
         #print(student.getFirstName())
         if electiveCount > 1:
-            print(student.getFirstName() + str(count - 1))
+            #print(student.getFirstName() + str(count - 1))
             return count - 1
         else:
-            print(student.getFirstName() + str(count))
+            #print(student.getFirstName() + str(count))
             return count
 
     def sports(student):
@@ -317,49 +348,53 @@ def orderStudents(students, prospective, date):
         return count
 
     #add feature to re-sort by certain preferences
-    students = sorted(students, reverse=True, key = lambda x: (checks(x), languages(x), sports(x), interests(x)))
+    if not order:
+        students = sorted(students, reverse=True, key = lambda x: (checks(x), languages(x), sports(x), interests(x)))
+    else:
+        students = sorted(students, reverse=True, key = lambda x: (sports(x), checks(x), languages(x), interests(x)))
     return students
 
 
 def output(students, prospective, time):
-    print("Prospective student: " + prospective.getFirstName() +\
+    toReturn = "Prospective student: " + prospective.getFirstName() +\
             " will visit on " + time[0] + " which is a " +\
             time[1] + " day from periods " + time[2] +\
-            " to " + time[3])
+            " to " + time[3]
     for num, stu in enumerate(students):
+        toReturn += "\n"
         if num >= 5: break
-        print(str(num + 1) + ". " + stu.getFirstName() + " " +\
-                stu.getLastName() + ". Reasons:")
+        toReturn += "\n" + str(num + 1) + ". " + stu.getFirstName() + " " +\
+                stu.getLastName() + ". \n Reasons:"
         if stu.getGrade() == prospective.getGrade():
-            print("Both in grade " + str(stu.getGrade()))
+            toReturn += "\n" + "Both are in grade " + str(stu.getGrade())
         if stu.getGender() == prospective.getGender():
-            print("Both are " + stu.getGender())
+            toReturn += "\n" + "Both are " + stu.getGender()
         if stu.getDayBoard() == prospective.getDayBoard():
-            print("Both are " + stu.getDayBoard() + " students")
+            toReturn += "\n" + "Both are " + stu.getDayBoard() + " students"
         if stu.getLanguages() != ['']:
             for lang in stu.getLanguages():
                 if lang in prospective.getLanguages():
-                    print("Both are fluent in " + lang)
+                    toReturn += "\n" + "Both are fluent in " + lang
         if stu.getSportsLFA() != ['']:
             for sport in stu.getSportsLFA():
                 if sport in prospective.getSportsLFA():
-                    print("Both play " + sport)
+                    toReturn += "\n" + "Both play " + sport
         if stu.getArts() != ['']:
             for art in stu.getArts():
                 if art in prospective.getArts():
-                    print("Both enjoy " + art)
+                    toReturn += "\n" + "Both enjoy " + art
         if prospective.getAffinity() != ['']:
             for aff in stu.getAffinity():
                 if aff in prospective.getAffinity():
-                    print("Both are interested in " + aff)
+                    toReturn += "\n" + "Both are interested in " + aff
         if prospective.getClubsMajor() != ['']:
             for club in stu.getClubsMajor():
                 if club in prospective.getClubsMajor():
-                    print("Both are interested in " + club)
+                    toReturn += "\n" + "Both are interested in " + club
         if prospective.getInterests() != ['']:
             for interest in stu.getInterests():
                 if interest in prospective.getInterests():
-                    print("Both are interested in " + interest)
+                    toReturn += "\n" + "Both are interested in " + interest
 
         checkFor = list()
         if "Mathematics" in prospective.getInterests():
@@ -409,17 +444,18 @@ def output(students, prospective, time):
             if course == []:
                 continue
             if course[1][0:2] in checkFor and course[1][0:3] != "119":
-                print(stu.getFirstName() + " is in " + course[0])
+                toReturn += "\n" + stu.getFirstName() + " is in " + course[0]
                 checkFor.remove(course[1][0:2])
             for word in wordCheck:
                 if word in course[0]:
-                    print(stu.getFirstName() + " is in " + course[0])
+                    toReturn += "\n" + stu.getFirstName() + " is in " + course[0]
                     wordCheck.remove(word)
             for art in artsCheck:
                 if art in course[0]:
-                    print(stu.getFirstName() + " is in " + course[0])
+                    toReturn += "\n" + stu.getFirstName() + " is in " + course[0]
                     artsCheck.remove(art)
+    return toReturn
     
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()

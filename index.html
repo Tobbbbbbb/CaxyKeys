@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Caxy Key Shadows</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.0/full/pyodide.js"></script>
+  </head>
+  <body>
+    <div class="fsElement fsContainer top-bar" id="fsEl_4742" data-use-new="true">
+<figure class="fsImage"><a href="/"><span><picture><img alt="" data-image-sizes="[{%22url%22:%22https://resources.finalsite.net/images/v1548961726/lakeforest/szhhznb7r80zmrpxky3g/LogoWhite.svg%22,%22width%22:330}]" data-resource-description="" data-resource-filename="LogoWhite.svg" data-resource-uuid="2b27a4a7-5998-4bf8-8cf3-e15bf0a3bf78" id="" onerror="this.error=null; this.src='/uploaded/themes/default/images/logo.png'" role="presentation" src="https://resources.finalsite.net/images/v1548961726/lakeforest/szhhznb7r80zmrpxky3g/LogoWhite.svg" style=""></picture></span></a></figure>
+</div>
+    <br/>
+    <h1>Instructions for Use</h1>
+    <h2>Form Output File</h2>
+    <p>
+      The first data file should be the csv output from Toby's version of the Caxy Key form.
+      This can be found by linking a google sheets to the form.
+      Open the form, then navigate to file -> download -> comma separated values.
+    </p>
+    <h2>Class Data File</h2>
+    <p>
+      The second data file should be a csv downloaded from veracross containing the class schedule of every student.
+      You can generate this using the following code:
+      [ENTER INSTRUCTIONS HERE, Mr. Ward]
+      For this semester, Mr. Ward has likely emailed you the file, so you don't need to do this this year.
+    </p>
+    <h2>Shadow Data File</h2>
+    <p>
+      The third data file should be a csv containing info about the shadows.
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfnVtYdoWqm7kDemX5EnnMrcpmJEpRrZuMUa_vH4Th-jjyFLw/viewform"> Click here for the form! </a>
+      The data can be downloaded by linking a google sheets to the form.
+      Open the form, then navigate to file -> download -> comma separated values.
+    </p>
+    <h2>Shadow Name</h2>
+    <p>
+      Input the full name of the shadow you want to match up a student with.
+    </p>
+    <h2>Prioritize Sports?</h2>
+    <p>
+      Tick this box if this a student where matching them up with a student who plays their sport is the top priority.
+    </p>
+    <br/>
+    <h1>Upload Files</h1>
+    <label>Input Caxy Key Data:</label>
+    <br/>
+    <input type="file" id="formOutput" accept=".csv" />
+    <br/>
+    <label>Input Class Data:</label>
+    <br/>
+    <input type="file" id="classes" accept=".csv" />
+    <br/>
+    <label>Input Shadow Data:</label>
+    <br/>
+    <input type="file" id="shadows" accept=".csv" />
+    <br/>
+    <label>Input Shadow Name:</label>
+    <br/>
+    <input type="text" id="name" min="1"/>
+    <br/>
+    <label class="container">
+      <input type="checkbox" id="sports"/>
+      <span class="checkmark"></span>
+      <p id="check"> &nbsp &nbsp &nbsp Prioritize Sports?</p>
+    </label>
+    <br/>
+    <br/>
+    <button onclick="executePython()">Submit</button>
+    <br/>
+    <br/>
+    <h1>Results</h1>
+    <div id="output" style="white-space:pre">Output will appear here when complete</div>
+    <br/>
+    <br/>
+
+
+    <py-config>
+      [[fetch]]
+      files = ["./nodes.py"]
+    </py-config>
+    <py-script src="./CaxyKeys.py">
+    </py-script>
+    <script>
+      function getCsv(id) {
+        var file = document.getElementById(id).files[0];
+        const reader = new FileReader();
+        return new Promise((resolve, reject) => {
+          reader.onload = async function() {
+            console.log(reader.result);
+            toReturn = resolve(reader.result);
+          };
+          reader.onerror = async function() {
+            reject(new DOMException("Problem parsing input file."));
+          };
+          reader.readAsText(file);
+        });
+      }
+      async function executePython() {
+        data = await getCsv('formOutput');
+        classes = await getCsv('classes');
+        shadows = await getCsv('shadows');
+        name = await document.getElementById('name').value;
+        order = await document.getElementById('sports').checked;
+        main = await pyscript.interpreter.globals.get('main');
+        info = main(data, classes, shadows, name, order);
+        document.getElementById("output").innerHTML = info;
+      }
+    </script> 
+  </body>
+</html>
